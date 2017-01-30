@@ -2,7 +2,9 @@
 Low level interface for optimization solvers. This package is still under heavy development and is meant to be integrated to CVXPY in the future.
 
 ## Installation
-`python setup.py install`
+```python
+python setup.py install
+```
 
 
 ## Quadratic Programs
@@ -22,7 +24,6 @@ from mathprogbasepy import *
 
 p = QuadprogProblem(P, q, A, l, u)
 results = p.solve(solver = OSQP)
-
 ```
 
 The supported solvers at the moment are: `GUROBI`, `CPLEX`, `OSQP`.
