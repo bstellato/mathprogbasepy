@@ -1,0 +1,5 @@
+# Define solvers
+GUROBI = "GUROBI"
+CPLEX = "CPLEX"
+OSQP = "OSQP"
+OSQP_PUREPY = "OSQP_PUREPY"
