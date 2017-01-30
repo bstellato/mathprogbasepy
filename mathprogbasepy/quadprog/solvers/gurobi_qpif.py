@@ -56,6 +56,11 @@ class GUROBI(Solver):
         model.update()
         x = model.getVars()
 
+        # Constrain integer variables if present
+        if p.i_idx is not None:
+            for i in p.i_idx:
+                x[i].setAttr("vtype", 'I')
+
         # Add inequality constraints: iterate over the rows of Aeq
         # adding each row into the model
         for i in range(m):
@@ -110,9 +115,12 @@ class GUROBI(Solver):
             # Get solution
             sol = np.array([x[i].X for i in range(n)])
 
-            # Get dual variables  (Gurobi uses swapped signs (-1))
-            constrs = model.getConstrs()
-            dual = -np.array([constrs[i].Pi for i in range(m)])
+            if p.i_idx is None:
+                # Get dual variables  (Gurobi uses swapped signs (-1))
+                constrs = model.getConstrs()
+                dual = -np.array([constrs[i].Pi for i in range(m)])
+            else:
+                dual = None
 
             # Get computation time
             cputime = model.Runtime

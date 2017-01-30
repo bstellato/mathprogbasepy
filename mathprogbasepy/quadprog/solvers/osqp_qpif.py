@@ -11,6 +11,9 @@ class OSQP(Solver):
 
     def solve(self, p):
 
+        if p.i_idx is not None:
+            raise ValueError('Cannot solve MIQPs with OSQP')
+
         # Convert Matrices in CSc format
         p.A = p.A.tocsc()
         p.P = p.P.tocsc()

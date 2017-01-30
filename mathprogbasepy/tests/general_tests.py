@@ -7,7 +7,8 @@ import scipy.sparse as spspa
 import scipy as sp
 import numpy as np
 import ipdb
-from mathprogbasepy import *
+import mathprogbasepy as mpbpy
+
 # from mathprogbasepy.quadprog.solvers.solvers import OSQP_PUREPY
 
 
@@ -26,7 +27,7 @@ def load_maros_meszaros_problem(f):
     l = np.append(m['rl'].T.flatten().astype(float),
                   m['lb'].T.flatten().astype(float))
     # Define problem
-    p = QuadprogProblem(P, q, A, l, u)
+    p = mpbpy.QuadprogProblem(P, q, A, l, u)
 
     return p
 
@@ -37,7 +38,7 @@ def main():
     #                 'infeasible', 'random_infeasible',
     #                 'maros_meszaros', 'lp', 'unbounded_lp',
     #                 'unbounded_qp'}
-    example = 'unbounded_qp'
+    example = 'small1'
 
     if example == 'maros_meszaros':
         # Maros Meszaros Examples
@@ -58,7 +59,7 @@ def main():
                          spspa.eye(P.shape[0])]).tocsc()
         l = np.array([1.0, 0.0, 0.0])
         u = np.array([1.0, 0.7, 0.7])
-        p = QuadprogProblem(P, q, A, l, u)
+        p = mpbpy.QuadProgProblem(P, q, A, l, u)
     elif example == 'small2':
         # Small Example 2
         P = spspa.csc_matrix(np.array([[11., 0.], [0., 0.]]))
@@ -67,7 +68,7 @@ def main():
                                       [2, 5], [3, 4]]))
         u = np.array([0., 0., -15, 100, 80])
         l = -np.inf * np.ones(len(u))
-        p = QuadprogProblem(P, q, A, l, u)
+        p = mpbpy.QuadProgProblem(P, q, A, l, u)
     elif example == 'infeasible':
         # Infeasible example
         # P = spspa.eye(2)
@@ -76,7 +77,7 @@ def main():
         A = spspa.csc_matrix(np.array([[1, 0], [0, 1], [1, 1]]))
         l = np.array([0., 0., -1.])
         u = np.array([np.inf, np.inf, -1.])
-        p = QuadprogProblem(P, q, A, l, u)
+        p = mpbpy.QuadProgProblem(P, q, A, l, u)
     elif example == 'random_infeasible':
         # Random Example
         n = 50
@@ -97,7 +98,7 @@ def main():
         # l[int(n/3)] = u[int(n/3)] + 100 * sp.rand()
         # l[int(n/4)] = u[int(n/4)] + 50. * sp.rand()
 
-        p = QuadprogProblem(P, q, A, l, u)
+        p = mpbpy.QuadProgProblem(P, q, A, l, u)
     elif example == 'unbounded_lp':
         # Unbounded example
         P = spspa.csc_matrix((2, 2))
@@ -105,7 +106,7 @@ def main():
         A = spspa.eye(2)
         l = np.array([0., 0.])
         u = np.array([np.inf, np.inf])
-        p = QuadprogProblem(P, q, A, l, u)
+        p = mpbpy.QuadProgProblem(P, q, A, l, u)
     elif example == 'unbounded_qp':
         # Unbounded example
         P = spspa.csc_matrix(np.diag(np.array([4., 0.])))
@@ -113,7 +114,7 @@ def main():
         A = spspa.csc_matrix([[1., 1.], [-1., 1.]])
         l = np.array([-np.inf, -np.inf])
         u = np.array([2., 3.])
-        p = QuadprogProblem(P, q, A, l, u)
+        p = mpbpy.QuadProgProblem(P, q, A, l, u)
     elif example == 'random':
         # Random Example
         n = 30
@@ -127,7 +128,7 @@ def main():
         # l = u
         l = -3 + sp.randn(m)
 
-        p = QuadprogProblem(P, q, A, l, u)
+        p = mpbpy.QuadProgProblem(P, q, A, l, u)
     elif example == 'lp':
         # Random Example
         n = 100
@@ -138,24 +139,24 @@ def main():
         A = spspa.vstack([spspa.csc_matrix(sp.randn(m, n)), spspa.eye(n)])
         l = np.append(- 3 + sp.randn(m), - 3 + sp.randn(n))
         u = np.append(3 + sp.randn(m), 3 + sp.randn(n))
-        p = QuadprogProblem(P, q, A, l, u)
+        p = mpbpy.QuadProgProblem(P, q, A, l, u)
     else:
         assert False, "Unknown example"
 
     # Solve with CPLEX
     print "\nSolve with CPLEX"
     print "-----------------"
-    resultsCPLEX = p.solve(solver=CPLEX, verbose=True)
+    resultsCPLEX = p.solve(solver=mpbpy.CPLEX, verbose=True)
 
     # Solve with GUROBI
     print "\nSolve with GUROBI"
     print "-----------------"
-    resultsGUROBI = p.solve(solver=GUROBI, OutputFlag=1)
+    resultsGUROBI = p.solve(solver=mpbpy.GUROBI, OutputFlag=1)
 
     # Solve with OSQP. You can pass options to OSQP solver
     print "\nSolve with OSQP"
     print "-----------------"
-    resultsOSQP = p.solve(solver=OSQP_PUREPY, max_iter=2500,
+    resultsOSQP = p.solve(solver=mpbpy.OSQP_PUREPY, max_iter=2500,
                           eps_rel=1e-05,
                           eps_abs=1e-5,
                           alpha=1.6,

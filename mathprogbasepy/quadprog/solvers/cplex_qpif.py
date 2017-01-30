@@ -3,6 +3,7 @@ import numpy as np
 import mathprogbasepy.quadprog.problem as qp
 from mathprogbasepy.quadprog.solvers.solver import Solver
 from mathprogbasepy.quadprog.results import QuadprogResults
+from ipdb import set_trace
 
 import cplex as cpx
 
@@ -16,7 +17,10 @@ class CPLEX(Solver):
     STATUS_MAP = {1: qp.OPTIMAL,
                   3: qp.INFEASIBLE,
                   2: qp.UNBOUNDED,
-                  10: qp.MAX_ITER_REACHED}
+                  10: qp.MAX_ITER_REACHED,
+                  101: qp.OPTIMAL,
+                  103: qp.INFEASIBLE,
+                  118: qp.UNBOUNDED}
 
     def solve(self, p):
 
@@ -46,6 +50,11 @@ class CPLEX(Solver):
         model.variables.add(obj=p.q,
                             lb=-cpx.infinity*np.ones(n),
                             ub=cpx.infinity*np.ones(n))  # Linear obj part
+
+        # Constrain integer variables if present
+        if p.i_idx is not None:
+            for i in p.i_idx:
+                model.variables.set_types(i, 'I')
 
         # Add constraints
         for i in range(m):  # Add inequalities
@@ -116,7 +125,10 @@ class CPLEX(Solver):
             sol = np.array(model.solution.get_values())
 
             # Get dual values
-            dual = -np.array(model.solution.get_dual_values())
+            if p.i_idx is None:
+                dual = -np.array(model.solution.get_dual_values())
+            else:
+                dual = None
 
             # Get computation time
             cputime = end-start
