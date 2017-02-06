@@ -3,7 +3,6 @@ import numpy as np
 import mathprogbasepy.quadprog.problem as qp
 from mathprogbasepy.quadprog.solvers.solver import Solver
 from mathprogbasepy.quadprog.results import QuadprogResults
-from ipdb import set_trace
 
 import cplex as cpx
 
