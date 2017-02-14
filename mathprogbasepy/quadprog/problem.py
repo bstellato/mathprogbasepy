@@ -1,6 +1,7 @@
+from __future__ import absolute_import
 # Interface to various QP solvers
 import numpy as np
-import solvers.solvers as s
+import mathprogbasepy.quadprog.solvers.solvers as s
 
 # Solver Constants
 OPTIMAL = "optimal"
@@ -55,16 +56,16 @@ class QuadprogProblem(object):
 
         # Set solver
         if solver == s.GUROBI:
-            from solvers.gurobi_qpif import GUROBI
+            from .solvers.gurobi_qpif import GUROBI
             solver = GUROBI(**kwargs)  # Initialize solver
         elif solver == s.CPLEX:
-                from solvers.cplex_qpif import CPLEX
+                from .solvers.cplex_qpif import CPLEX
                 solver = CPLEX(**kwargs)  # Initialize solver
         elif solver == s.OSQP:
-                from solvers.osqp_qpif import OSQP
+                from .solvers.osqp_qpif import OSQP
                 solver = OSQP(**kwargs)  # Initialize solver
         elif solver == s.OSQP_PUREPY:
-                from solvers.osqp_purepy_qpif import OSQP_PUREPY
+                from .solvers.osqp_purepy_qpif import OSQP_PUREPY
                 solver = OSQP_PUREPY(**kwargs)  # Initialize solver
 
         # Solve problem

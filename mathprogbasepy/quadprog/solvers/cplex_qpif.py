@@ -1,3 +1,4 @@
+from __future__ import print_function
 # CPLEX interface to solve QP problems
 import numpy as np
 import mathprogbasepy.quadprog.problem as qp
@@ -103,7 +104,7 @@ class CPLEX(Solver):
             model.solve()
             end = model.get_time()
         except:  # Error in the solution
-            print "Error in CPLEX solution\n"
+            print("Error in CPLEX solution\n")
             return QuadprogResults(qp.SOLVER_ERROR, None, None, None,
                                    np.inf, None)
 

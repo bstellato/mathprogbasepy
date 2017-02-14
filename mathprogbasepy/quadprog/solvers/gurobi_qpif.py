@@ -1,3 +1,4 @@
+from __future__ import print_function
 # GUROBI interface to solve QP problems
 import numpy as np
 from mathprogbasepy.quadprog.results import QuadprogResults
@@ -99,7 +100,7 @@ class GUROBI(Solver):
             # Solve
             model.optimize()
         except:  # Error in the solution
-            print "Error in Gurobi solution\n"
+            print("Error in Gurobi solution\n")
             return QuadprogResults(qp.SOLVER_ERROR, None, None, None,
                                    np.inf, None)
 

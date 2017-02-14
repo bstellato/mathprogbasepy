@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # Test QP solver against Maros Mezaros Benchmark suite
+from __future__ import print_function
 import sys
 import scipy.io as spio
 import scipy.sparse as spspa
@@ -144,18 +145,18 @@ def main():
         assert False, "Unknown example"
 
     # Solve with CPLEX
-    print "\nSolve with CPLEX"
-    print "-----------------"
+    print("\nSolve with CPLEX")
+    print("-----------------")
     resultsCPLEX = p.solve(solver=mpbpy.CPLEX, verbose=True)
 
     # Solve with GUROBI
-    print "\nSolve with GUROBI"
-    print "-----------------"
+    print("\nSolve with GUROBI")
+    print("-----------------")
     resultsGUROBI = p.solve(solver=mpbpy.GUROBI, OutputFlag=1)
 
     # Solve with OSQP. You can pass options to OSQP solver
-    print "\nSolve with OSQP"
-    print "-----------------"
+    print("\nSolve with OSQP")
+    print("-----------------")
     resultsOSQP = p.solve(solver=mpbpy.OSQP_PUREPY, max_iter=2500,
                           eps_rel=1e-05,
                           eps_abs=1e-5,
@@ -165,27 +166,27 @@ def main():
                           polishing=False)
 
     if resultsGUROBI.status != 'solver_error':
-        print "\n"
+        print("\n")
         print("Comparison CPLEX - GUROBI")
         print("-------------------------")
-        print "Difference in objective value %.8f" % \
-            np.linalg.norm(resultsCPLEX.objval - resultsGUROBI.objval)
-        print "Norm of solution difference %.8f" % \
-            np.linalg.norm(resultsCPLEX.x - resultsGUROBI.x)
-        print "Norm of dual difference %.8f" % \
-            np.linalg.norm(resultsCPLEX.y - resultsGUROBI.y)
+        print("Difference in objective value %.8f" % \
+            np.linalg.norm(resultsCPLEX.objval - resultsGUROBI.objval))
+        print("Norm of solution difference %.8f" % \
+            np.linalg.norm(resultsCPLEX.x - resultsGUROBI.x))
+        print("Norm of dual difference %.8f" % \
+            np.linalg.norm(resultsCPLEX.y - resultsGUROBI.y))
 
-        print "\n"
+        print("\n")
         print("Comparison OSQP - GUROBI")
         print("-------------------------")
-        print "Difference in objective value %.8f" % \
-            np.linalg.norm(resultsOSQP.objval - resultsGUROBI.objval)
-        print "Norm of solution difference %.8f" % \
-            np.linalg.norm(resultsOSQP.x - resultsGUROBI.x)
-        print "Norm of dual difference %.8f" % \
-            np.linalg.norm(resultsOSQP.y - resultsGUROBI.y)
+        print("Difference in objective value %.8f" % \
+            np.linalg.norm(resultsOSQP.objval - resultsGUROBI.objval))
+        print("Norm of solution difference %.8f" % \
+            np.linalg.norm(resultsOSQP.x - resultsGUROBI.x))
+        print("Norm of dual difference %.8f" % \
+            np.linalg.norm(resultsOSQP.y - resultsGUROBI.y))
     else:
-        print "Problem is infeasible or unbounded"
+        print("Problem is infeasible or unbounded")
 
     ipdb.set_trace()
 
