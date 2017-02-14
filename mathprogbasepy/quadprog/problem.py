@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 # Interface to various QP solvers
+from builtins import object
 import numpy as np
 import mathprogbasepy.quadprog.solvers.solvers as s
 

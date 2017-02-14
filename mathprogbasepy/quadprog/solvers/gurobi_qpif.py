@@ -1,5 +1,6 @@
 from __future__ import print_function
 # GUROBI interface to solve QP problems
+from builtins import range
 import numpy as np
 from mathprogbasepy.quadprog.results import QuadprogResults
 from mathprogbasepy.quadprog.solvers.solver import Solver
@@ -84,7 +85,7 @@ class GUROBI(Solver):
         model.setObjective(obj)  # Set objective
 
         # Set parameters
-        for param, value in self.options.iteritems():
+        for param, value in self.options.items():
             if param == "verbose":
                 if value == 0:
                     model.setParam("OutputFlag", 0)

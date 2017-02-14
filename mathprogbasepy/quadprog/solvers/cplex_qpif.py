@@ -1,5 +1,6 @@
 from __future__ import print_function
 # CPLEX interface to solve QP problems
+from builtins import range
 import numpy as np
 import mathprogbasepy.quadprog.problem as qp
 from mathprogbasepy.quadprog.solvers.solver import Solver
@@ -87,7 +88,7 @@ class CPLEX(Solver):
             model.objective.set_quadratic(qmat)
 
         # Set parameters
-        for param, value in self.options.iteritems():
+        for param, value in self.options.items():
             if param == "verbose":
                 if value == 0:
                     model.set_results_stream(None)

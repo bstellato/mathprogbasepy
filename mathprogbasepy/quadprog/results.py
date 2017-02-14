@@ -1,4 +1,5 @@
 # Quadprog results class
+from builtins import object
 class QuadprogResults(object):
 
     """
