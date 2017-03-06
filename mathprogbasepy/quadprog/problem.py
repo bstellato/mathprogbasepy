@@ -10,6 +10,7 @@ INFEASIBLE = "infeasible"
 UNBOUNDED = "unbounded"
 SOLVER_ERROR = "solver_error"
 MAX_ITER_REACHED = "max_iter_reached"
+TIME_LIMIT = "time_limit"
 
 # Statuses that indicate a solution was found.
 SOLUTION_PRESENT = [OPTIMAL]

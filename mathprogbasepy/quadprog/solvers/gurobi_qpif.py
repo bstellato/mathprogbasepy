@@ -22,6 +22,7 @@ class GUROBI(Solver):
                   6: qp.SOLVER_ERROR,
                   7: qp.MAX_ITER_REACHED,
                   8: qp.SOLVER_ERROR,
+                  9: qp.TIME_LIMIT,
                   10: qp.SOLVER_ERROR,
                   11: qp.SOLVER_ERROR,
                   12: qp.SOLVER_ERROR,

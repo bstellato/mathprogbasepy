@@ -21,6 +21,7 @@ class CPLEX(Solver):
                   10: qp.MAX_ITER_REACHED,
                   101: qp.OPTIMAL,
                   103: qp.INFEASIBLE,
+                  107: qp.TIME_LIMIT,
                   118: qp.UNBOUNDED}
 
     def solve(self, p):
@@ -48,14 +49,16 @@ class CPLEX(Solver):
         model.objective.set_sense(model.objective.sense.minimize)
 
         # Add variables
-        model.variables.add(obj=p.q,
-                            lb=-cpx.infinity*np.ones(n),
-                            ub=cpx.infinity*np.ones(n))  # Linear obj part
+        var_idx = model.variables.add(obj=p.q,
+                                      lb=-cpx.infinity*np.ones(n),
+                                      ub=cpx.infinity*np.ones(n))  # Linear obj part
 
         # Constrain integer variables if present
+        # import ipdb; ipdb.set_trace()
         if p.i_idx is not None:
-            for i in p.i_idx:
-                model.variables.set_types(i, 'I')
+            for idx in p.i_idx:
+                # import ipdb; ipdb.set_trace()
+                model.variables.set_types(var_idx[idx], 'I')
 
         # Add constraints
         for i in range(m):  # Add inequalities
@@ -114,7 +117,6 @@ class CPLEX(Solver):
         # Get status
         status = self.STATUS_MAP.get(model.solution.get_status(),
                                      qp.SOLVER_ERROR)
-
         # Get computation time
         cputime = end-start
 
