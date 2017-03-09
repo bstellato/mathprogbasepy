@@ -61,14 +61,14 @@ class QuadprogProblem(object):
             from .solvers.gurobi_qpif import GUROBI
             solver = GUROBI(**kwargs)  # Initialize solver
         elif solver == s.CPLEX:
-                from .solvers.cplex_qpif import CPLEX
-                solver = CPLEX(**kwargs)  # Initialize solver
+            from .solvers.cplex_qpif import CPLEX
+            solver = CPLEX(**kwargs)  # Initialize solver
         elif solver == s.OSQP:
-                from .solvers.osqp_qpif import OSQP
-                solver = OSQP(**kwargs)  # Initialize solver
+            from .solvers.osqp_qpif import OSQP
+            solver = OSQP(**kwargs)  # Initialize solver
         elif solver == s.OSQP_PUREPY:
-                from .solvers.osqp_purepy_qpif import OSQP_PUREPY
-                solver = OSQP_PUREPY(**kwargs)  # Initialize solver
+            from .solvers.osqp_purepy_qpif import OSQP_PUREPY
+            solver = OSQP_PUREPY(**kwargs)  # Initialize solver
 
         # Solve problem
         results = solver.solve(self)  # Solve problem
