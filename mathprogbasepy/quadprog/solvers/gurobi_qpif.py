@@ -64,6 +64,11 @@ class GUROBI(Solver):
             for i in p.i_idx:
                 x[i].setAttr("vtype", 'I')
 
+        # Set initial guess if passed
+        if p.x0 is not None:
+            for i in range(n):
+                x[i].start = p.x0[i]
+
         # Add inequality constraints: iterate over the rows of Aeq
         # adding each row into the model
         for i in range(m):

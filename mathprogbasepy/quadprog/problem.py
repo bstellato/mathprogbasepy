@@ -41,7 +41,7 @@ class QuadprogProblem(object):
         index of integer variables
     """
 
-    def __init__(self, P, q, A, l=None, u=None, i_idx=None):
+    def __init__(self, P, q, A, l=None, u=None, i_idx=None, x0=None):
         self.n = P.shape[0]
         self.m = A.shape[0]
         self.P = P
@@ -50,6 +50,10 @@ class QuadprogProblem(object):
         self.l = l if l is not None else -np.inf*np.ones(P.shape[0])
         self.u = u if u is not None else np.inf*np.ones(P.shape[0])
         self.i_idx = i_idx
+        self.x0 = x0
+
+        if x0 is not None and len(x0) != self.n:
+            raise ValueError('Initial guess has wrong dimensions!')
 
     def solve(self, solver=s.GUROBI, **kwargs):
         """
