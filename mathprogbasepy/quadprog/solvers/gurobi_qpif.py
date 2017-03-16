@@ -64,10 +64,14 @@ class GUROBI(Solver):
             for i in p.i_idx:
                 x[i].setAttr("vtype", 'I')
 
+        model.update()
+
         # Set initial guess if passed
         if p.x0 is not None:
             for i in range(n):
                 x[i].start = p.x0[i]
+
+        model.update()
 
         # Add inequality constraints: iterate over the rows of Aeq
         # adding each row into the model
@@ -91,11 +95,13 @@ class GUROBI(Solver):
         model.setObjective(obj)  # Set objective
 
         # Set parameters
+        # if verbose null, suppress it first
+        if 'verbose' in self.options:
+            if self.options['verbose'] == 0:
+                model.setParam("OutputFlag", 0)
+        # Set other parameters
         for param, value in self.options.items():
-            if param == "verbose":
-                if value == 0:
-                    model.setParam("OutputFlag", 0)
-            else:
+            if param is not "verbose":
                 model.setParam(param, value)
 
         # Update model
