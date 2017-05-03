@@ -1,5 +1,5 @@
 # mathprogbasepy
-Low level interface for Mixed-Integer Quadratic Programs and Mixed-Integer Linerar Program optimization solvers.
+Low level interface for Mixed-Integer Quadratic Programs and Mixed-Integer Linerar Programs optimization solvers.
 
 ## Installation
 ```python
@@ -27,5 +27,9 @@ p = QuadprogProblem(P, q, A, l, u, i_idx)
 results = p.solve(solver = OSQP)
 ```
 
+The current version is `0.1.0`
+
 The supported solvers at the moment are: `OSQP`, `GUROBI`, `CPLEX`, `MOSEK`.
+
+
 Matrices `P` and `A` are in scipy sparse format. vectors `q`, `l` and `u` are numpy arrays.
