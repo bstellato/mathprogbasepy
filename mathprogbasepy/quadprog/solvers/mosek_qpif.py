@@ -89,7 +89,7 @@ class MOSEK(Solver):
 
             for j in range(m):
                 # Get bounds and keys
-                u_temp = p.u[j] if p.u[j] < 1e20 else p.inf
+                u_temp = p.u[j] if p.u[j] < 1e20 else np.inf
                 l_temp = p.l[j] if p.l[j] > -1e20 else -np.inf
 
                 # Divide 5 cases
