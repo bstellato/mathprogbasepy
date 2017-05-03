@@ -1,5 +1,5 @@
 # mathprogbasepy
-Low level interface for optimization solvers. This package is still under heavy development and is meant to be integrated to CVXPY in the future.
+Low level interface for Mixed-Integer Quadratic Programs and Mixed-Integer Linerar Program optimization solvers.
 
 ## Installation
 ```python
@@ -27,5 +27,5 @@ p = QuadprogProblem(P, q, A, l, u, i_idx)
 results = p.solve(solver = OSQP)
 ```
 
-The supported solvers at the moment are: `GUROBI`, `CPLEX`, `OSQP`.
-Note that matrices `P` and `A` are in scipy sparse format. vectors `q`, `l` and `u` are numpy arrays.
+The supported solvers at the moment are: `OSQP`, `GUROBI`, `CPLEX`, `MOSEK`.
+Matrices `P` and `A` are in scipy sparse format. vectors `q`, `l` and `u` are numpy arrays.

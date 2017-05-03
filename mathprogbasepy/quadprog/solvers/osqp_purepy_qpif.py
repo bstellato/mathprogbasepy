@@ -14,9 +14,11 @@ class OSQP_PUREPY(Solver):
         if p.i_idx is not None:
             raise ValueError('Cannot solve MIQPs with OSQP')
 
-        # Convert Matrices in CSc format
-        p.A = p.A.tocsc()
-        p.P = p.P.tocsc()
+        if p.P is not None:
+            p.P = p.P.tocsc()
+
+        if p.A is not None:
+            p.A = p.A.tocsc()
 
         m = osqp.OSQP()
         m.setup(p.P, p.q, p.A, p.l, p.u, **self.options)

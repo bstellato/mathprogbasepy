@@ -16,8 +16,8 @@ class GUROBI(Solver):
 
     # Map of Gurobi status to CVXPY status.
     STATUS_MAP = {2: qp.OPTIMAL,
-                  3: qp.INFEASIBLE,
-                  5: qp.UNBOUNDED,
+                  3: qp.PRIMAL_INFEASIBLE,
+                  5: qp.DUAL_INFEASIBLE,
                   4: qp.SOLVER_ERROR,
                   6: qp.SOLVER_ERROR,
                   7: qp.MAX_ITER_REACHED,
@@ -30,15 +30,17 @@ class GUROBI(Solver):
 
     def solve(self, p):
 
-        # Convert Matrices in CSR format
-        p.A = p.A.tocsr()
+        if p.A is not None:
+            # Convert Matrices in CSR format
+            p.A = p.A.tocsr()
 
-        # Convert P matrix to COO format
-        p.P = p.P.tocoo()
+        if p.P is not None:
+            # Convert P matrix to COO format
+            p.P = p.P.tocoo()
 
         # Get problem dimensions
-        n = p.P.shape[0]
-        m = p.A.shape[0]
+        n = p.n
+        m = p.m
 
         # Adjust infinity values in bounds
         u = np.copy(p.u)
@@ -73,26 +75,28 @@ class GUROBI(Solver):
 
         model.update()
 
-        # Add inequality constraints: iterate over the rows of Aeq
+        # Add inequality constraints: iterate over the rows of A
         # adding each row into the model
-        for i in range(m):
-            start = p.A.indptr[i]
-            end = p.A.indptr[i+1]
-            variables = [x[j] for j in p.A.indices[start:end]]  # Get nnz
-            coeff = p.A.data[start:end]
-            expr = grb.LinExpr(coeff, variables)
-            if (np.abs(l[i] - u[i]) < 1e-08):
-                model.addConstr(expr, grb.GRB.EQUAL, u[i])
-            else:
-                model.addRange(expr, lower=l[i], upper=u[i])
+        if p.A is not None:
+            for i in range(m):
+                start = p.A.indptr[i]
+                end = p.A.indptr[i+1]
+                variables = [x[j] for j in p.A.indices[start:end]]  # Get nnz
+                coeff = p.A.data[start:end]
+                expr = grb.LinExpr(coeff, variables)
+                if (np.abs(l[i] - u[i]) < 1e-08):
+                    model.addConstr(expr, grb.GRB.EQUAL, u[i])
+                else:
+                    model.addRange(expr, lower=l[i], upper=u[i])
 
         # Define objective
-        obj = grb.QuadExpr()  # Set quadratic part
-        if p.P.count_nonzero():  # If there are any nonzero elms in P
-            for i in range(p.P.nnz):
-                obj.add(.5*p.P.data[i]*x[p.P.row[i]]*x[p.P.col[i]])
-        obj.add(grb.LinExpr(p.q, x))  # Add linear part
-        model.setObjective(obj)  # Set objective
+        if p.P is not None:
+            obj = grb.QuadExpr()  # Set quadratic part
+            if p.P.count_nonzero():  # If there are any nonzero elms in P
+                for i in range(p.P.nnz):
+                    obj.add(.5*p.P.data[i]*x[p.P.row[i]]*x[p.P.col[i]])
+            obj.add(grb.LinExpr(p.q, x))  # Add linear part
+            model.setObjective(obj)  # Set objective
 
         # Set parameters
         # if verbose null, suppress it first
@@ -122,7 +126,7 @@ class GUROBI(Solver):
         # Get status
         status = self.STATUS_MAP.get(model.Status, qp.SOLVER_ERROR)
 
-        if (status != qp.SOLVER_ERROR) & (status != qp.INFEASIBLE):
+        if (status != qp.SOLVER_ERROR) & (status != qp.PRIMAL_INFEASIBLE):
             # Get objective value
             objval = model.objVal
 

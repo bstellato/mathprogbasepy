@@ -6,16 +6,18 @@ import mathprogbasepy.quadprog.solvers.solvers as s
 
 # Solver Constants
 OPTIMAL = "optimal"
-INFEASIBLE = "infeasible"
-UNBOUNDED = "unbounded"
+OPTIMAL_INACCURATE = "optimal inaccurate"
+PRIMAL_INFEASIBLE = "primal infeasible"
+PRIMAL_INFEASIBLE_INACCURATE = "primal infeasible inaccurate"
+DUAL_INFEASIBLE = "dual infeasible"
+DUAL_INFEASIBLE_INACCURATE = "dual infeasible inaccurate"
 SOLVER_ERROR = "solver_error"
 MAX_ITER_REACHED = "max_iter_reached"
 TIME_LIMIT = "time_limit"
 
 # Statuses that indicate a solution was found.
-SOLUTION_PRESENT = [OPTIMAL]
-# Statuses that indicate the problem is infeasible or unbounded.
-INF_OR_UNB = [INFEASIBLE, UNBOUNDED]
+SOLUTION_PRESENT = [OPTIMAL, OPTIMAL_INACCURATE]
+
 
 
 class QuadprogProblem(object):
@@ -41,9 +43,26 @@ class QuadprogProblem(object):
         index of integer variables
     """
 
-    def __init__(self, P, q, A, l=None, u=None, i_idx=None, x0=None):
-        self.n = P.shape[0]
-        self.m = A.shape[0]
+    def __init__(self, P=None, q=None, A=None, l=None, u=None, i_idx=None, x0=None):
+
+
+        #
+        # Get problem dimensions
+        #
+        if P is None:
+            if q is not None:
+                self.n = len(q)
+            elif A is not None:
+                self.n = A.shape[1]
+            else:
+                raise ValueError("The problem does not have any variables")
+        else:
+            self.n = P.shape[0]
+        if A is None:
+            self.m = 0
+        else:
+            self.m = A.shape[0]
+
         self.P = P
         self.q = q
         self.A = A
@@ -59,7 +78,6 @@ class QuadprogProblem(object):
         """
         Solve Quadratic Program with desired solver
         """
-
         # Set solver
         if solver == s.GUROBI:
             from .solvers.gurobi_qpif import GUROBI
@@ -70,6 +88,9 @@ class QuadprogProblem(object):
         elif solver == s.OSQP:
             from .solvers.osqp_qpif import OSQP
             solver = OSQP(**kwargs)  # Initialize solver
+        elif solver == s.MOSEK:
+            from .solvers.mosek_qpif import MOSEK
+            solver = MOSEK(**kwargs)  # Initialize solver
         elif solver == s.OSQP_PUREPY:
             from .solvers.osqp_purepy_qpif import OSQP_PUREPY
             solver = OSQP_PUREPY(**kwargs)  # Initialize solver

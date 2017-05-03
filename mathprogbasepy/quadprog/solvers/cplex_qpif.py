@@ -16,23 +16,26 @@ class CPLEX(Solver):
 
     # Map of CPLEX status to CVXPY status. #TODO: add more!
     STATUS_MAP = {1: qp.OPTIMAL,
-                  3: qp.INFEASIBLE,
-                  2: qp.UNBOUNDED,
+                  3: qp.PRIMAL_INFEASIBLE,
+                  2: qp.DUAL_INFEASIBLE,
                   10: qp.MAX_ITER_REACHED,
                   101: qp.OPTIMAL,
-                  103: qp.INFEASIBLE,
+                  103: qp.PRIMAL_INFEASIBLE,
                   107: qp.TIME_LIMIT,
-                  118: qp.UNBOUNDED}
+                  118: qp.DUAL_INFEASIBLE}
 
     def solve(self, p):
 
-        # Convert Matrices in CSR format
-        p.A = p.A.tocsr()
-        p.P = p.P.tocsr()
+        if p.P is not None:
+            p.P = p.P.tocsr()
+
+        if p.A is not None:
+            # Convert Matrices in CSR format
+            p.A = p.A.tocsr()
 
         # Get problem dimensions
-        n = p.P.shape[0]
-        m = p.A.shape[0]
+        n = p.n
+        m = p.m
 
         # Adjust infinity values in bounds
         u = np.copy(p.u)
@@ -120,7 +123,11 @@ class CPLEX(Solver):
         # Get computation time
         cputime = end-start
 
-        if (status != qp.SOLVER_ERROR) & (status != qp.INFEASIBLE):
+        # Get total number of iterations
+        total_iter = \
+            int(model.solution.progress.get_num_barrier_iterations())
+
+        if status in qp.SOLUTION_PRESENT:
             # Get objective value
             objval = model.solution.get_objective_value()
 
@@ -133,15 +140,8 @@ class CPLEX(Solver):
             else:
                 dual = None
 
-            # Get computation time
-            cputime = end-start
-
-            # Get total number of iterations
-            total_iter = \
-                int(model.solution.progress.get_num_barrier_iterations())
-
             return QuadprogResults(status, objval, sol, dual,
                                    cputime, total_iter)
         else:
             return QuadprogResults(status, None, None, None,
-                                   cputime, None)
+                                   cputime, total_iter)
