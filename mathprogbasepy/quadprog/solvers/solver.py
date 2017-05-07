@@ -9,7 +9,7 @@ class Solver(with_metaclass(abc.ABCMeta, object)):
         self.options = kwargs
 
         if 'verbose' not in self.options:
-            self.options['verbose'] = True
+            self.options['verbose'] = False
 
     @abc.abstractmethod
     def solve(self, p):

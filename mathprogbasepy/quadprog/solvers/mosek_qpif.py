@@ -20,6 +20,7 @@ class MOSEK(Solver):
 
     # Map of Mosek status to mathprogbasepy status.
     STATUS_MAP = {mosek.solsta.optimal: qp.OPTIMAL,
+                  mosek.solsta.integer_optimal: qp.OPTIMAL,
                   mosek.solsta.prim_infeas_cer: qp.PRIMAL_INFEASIBLE,
                   mosek.solsta.dual_infeas_cer: qp.DUAL_INFEASIBLE,
                   mosek.solsta.near_optimal: qp.OPTIMAL_INACCURATE,
@@ -73,14 +74,6 @@ class MOSEK(Solver):
             int_types = [mosek.variabletype.type_int] * len(p.i_idx)
             int_idx = p.i_idx.tolist()
             task.putvartypelist(int_idx, int_types)
-
-        # for j in range(n):
-        #     # Add columns of A
-        #     start = p.A.indptr[j]
-        #     end = p.A.indptr[j+1]
-        #     rows_col_j = p.A.indices[start:end]
-        #     coeff_col_j = p.A.data[start:end]
-        #     task.putacol(j, rows_col_j, coeff_col_j)
 
         # Add constraints
         if p.A is not None:
@@ -149,7 +142,8 @@ class MOSEK(Solver):
         status = self.STATUS_MAP.get(solsta, qp.SOLVER_ERROR)
 
         # Get statistics
-        cputime = task.getdouinf(mosek.dinfitem.optimizer_time)
+        cputime = task.getdouinf(mosek.dinfitem.optimizer_time) + \
+            task.getdouinf(mosek.dinfitem.presolve_time)
         total_iter = task.getintinf(mosek.iinfitem.intpnt_iter)
 
         if status in qp.SOLUTION_PRESENT:
@@ -159,10 +153,13 @@ class MOSEK(Solver):
             # get obj value
             objval = task.getprimalobj(soltype)
             # get dual
-            dual = np.zeros(task.getnumcon())
-            task.gety(soltype, dual)
-            # it appears signs are inverted
-            dual = -dual
+            if p.i_idx is None:
+                dual = np.zeros(task.getnumcon())
+                task.gety(soltype, dual)
+                # it appears signs are inverted
+                dual = -dual
+            else:
+                dual = None
 
             return QuadprogResults(status, objval, sol, dual,
                                    cputime, total_iter)
@@ -171,7 +168,7 @@ class MOSEK(Solver):
                                    cputime, None)
 
     def choose_solution(self, task):
-        """Chooses between the basic and interior point solution.
+        """Chooses between the basic, interior point solution or integer solution
         Parameters
         N.B. From CVXPY
         ----------
@@ -200,6 +197,12 @@ class MOSEK(Solver):
 
         solsta_bas, solsta_itr = None, None
 
+        # Integer solution
+        if task.solutiondef(mosek.soltype.itg):
+            solsta_itg = task.getsolsta(mosek.soltype.itg)
+            return mosek.soltype.itg, solsta_itg
+
+        # Continuous solution
         if task.solutiondef(mosek.soltype.bas):
             solsta_bas = task.getsolsta(mosek.soltype.bas)
 

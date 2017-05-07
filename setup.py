@@ -13,4 +13,4 @@ setup(name='mathprogbasepy',
       packages=['mathprogbasepy',
                 'mathprogbasepy.quadprog',
                 'mathprogbasepy.quadprog.solvers',
-                'mathprogbasepy.tests'])
+                'mathprogbasepy.unittests'])
