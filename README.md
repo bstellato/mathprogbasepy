@@ -27,7 +27,7 @@ p = QuadprogProblem(P, q, A, l, u, i_idx)
 results = p.solve(solver = OSQP)
 ```
 
-The current version is `0.1.0`
+The current version is `0.1.1`
 
 The supported solvers at the moment are: `OSQP`, `GUROBI`, `CPLEX`, `MOSEK`.
 

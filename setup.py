@@ -2,7 +2,7 @@ from setuptools import setup
 
 
 setup(name='mathprogbasepy',
-      version='0.1.0',
+      version='0.1.1',
       author='Bartolomeo Stellato',
       description='Low level interface for mathematical programming solvers.',
       url='http://github.com/bstellato/mathprogbasepy/',
