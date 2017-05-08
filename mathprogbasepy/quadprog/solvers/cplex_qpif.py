@@ -77,6 +77,11 @@ class CPLEX(Solver):
                 model.linear_constraints.add(lin_expr=row,
                                              senses=["L"],
                                              rhs=[u[i]])
+            elif (l[i] == -cpx.infinity) & (u[i] == cpx.infinity):
+                # Dummy constraint: a*x <= inf
+                model.linear_constraints.add(lin_expr=row,
+                                             senses=["L"],
+                                             rhs=[cpx.infinity])
             else:
                 model.linear_constraints.add(lin_expr=row,
                                              senses=["R"],
