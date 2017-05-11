@@ -86,6 +86,11 @@ class GUROBI(Solver):
                 expr = grb.LinExpr(coeff, variables)
                 if (np.abs(l[i] - u[i]) < 1e-08):
                     model.addConstr(expr, grb.GRB.EQUAL, u[i])
+                elif (l[i] == -grb.GRB.INFINITY) & (u[i] == grb.GRB.INFINITY):
+                    # Dummy constraint that is always satisfied.
+                    # Gurobi crashes if both constraints in addRange function
+                    # are infinite.
+                    model.addConstr(0.*expr, grb.GRB.LESS_EQUAL, 10.)
                 else:
                     model.addRange(expr, lower=l[i], upper=u[i])
 
