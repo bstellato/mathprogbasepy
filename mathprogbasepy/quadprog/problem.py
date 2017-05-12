@@ -11,6 +11,7 @@ PRIMAL_INFEASIBLE = "primal infeasible"
 PRIMAL_INFEASIBLE_INACCURATE = "primal infeasible inaccurate"
 DUAL_INFEASIBLE = "dual infeasible"
 DUAL_INFEASIBLE_INACCURATE = "dual infeasible inaccurate"
+PRIMAL_OR_DUAL_INFEASIBLE = "primal or dual infeasible"
 SOLVER_ERROR = "solver_error"
 MAX_ITER_REACHED = "max_iter_reached"
 TIME_LIMIT = "time_limit"
@@ -91,6 +92,9 @@ class QuadprogProblem(object):
         elif solver == s.MOSEK:
             from .solvers.mosek_qpif import MOSEK
             solver = MOSEK(**kwargs)  # Initialize solver
+        elif solver == s.qpOASES:
+            from .solvers.qpoases_qpif import qpOASES
+            solver = qpOASES(**kwargs)  # Initialize solver
         elif solver == s.OSQP_PUREPY:
             from .solvers.osqp_purepy_qpif import OSQP_PUREPY
             solver = OSQP_PUREPY(**kwargs)  # Initialize solver

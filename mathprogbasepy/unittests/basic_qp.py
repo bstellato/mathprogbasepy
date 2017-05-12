@@ -41,6 +41,9 @@ class basic_qp(unittest.TestCase):
         # Solve with OSQP
         res_osqp = self.p.solve(solver=mpbpy.OSQP)
 
+        # Solve with qpOASES
+        res_qpoases = self.p.solve(solver=mpbpy.qpOASES)
+
 
         # Assert solutions matching (GUROBI - CPLEX)
         nptest.assert_allclose(res_gurobi.obj_val,
@@ -73,4 +76,15 @@ class basic_qp(unittest.TestCase):
                                rtol=1e-4, atol=1e-4)
         nptest.assert_allclose(res_gurobi.y,
                                res_osqp.y,
+                               rtol=1e-4, atol=1e-4)
+
+        # Assert solutions matching (GUROBI - qpOASES)
+        nptest.assert_allclose(res_gurobi.obj_val,
+                               res_qpoases.obj_val,
+                               rtol=1e-4, atol=1e-4)
+        nptest.assert_allclose(res_gurobi.x,
+                               res_qpoases.x,
+                               rtol=1e-4, atol=1e-4)
+        nptest.assert_allclose(res_gurobi.y,
+                               res_qpoases.y,
                                rtol=1e-4, atol=1e-4)

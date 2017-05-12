@@ -2,6 +2,8 @@
 import qpoases
 from mathprogbasepy.quadprog.results import QuadprogResults
 from mathprogbasepy.quadprog.solvers.solver import Solver
+import mathprogbasepy.quadprog.problem as qp
+import numpy as np
 
 
 class qpOASES(Solver):
@@ -9,18 +11,31 @@ class qpOASES(Solver):
     An interface for the qpOASES QP solver.
     """
 
-    STATUS_MAP = {0: qp.OPTIMAL}
+    # Get return value class
+    _PyReturnValue = qpoases.PyReturnValue()
+    STATUS_MAP = {_PyReturnValue.SUCCESSFUL_RETURN: qp.OPTIMAL,
+                  _PyReturnValue.INIT_FAILED_INFEASIBILITY: qp.PRIMAL_INFEASIBLE,
+                  _PyReturnValue.INIT_FAILED_UNBOUNDEDNESS: qp.DUAL_INFEASIBLE,
+                  _PyReturnValue.MAX_NWSR_REACHED: qp.MAX_ITER_REACHED,
+                  _PyReturnValue.INIT_FAILED: qp.SOLVER_ERROR
+                  }
 
     def solve(self, p):
 
         if p.P is not None:
-            p.P = p.P.tocsc()
+            P = np.ascontiguousarray(p.P.todense())
 
         if p.A is not None:
-            p.A = p.A.tocsc()
+            A = np.ascontiguousarray(p.A.todense())
 
         if p.i_idx is not None:
             raise ValueError('Cannot solve MIQPs with qpOASES')
+
+        # Define contiguous array vectors
+        q = np.ascontiguousarray(p.q)
+        l = np.ascontiguousarray(p.l)
+        u = np.ascontiguousarray(p.u)
+
 
         # Solve with qpOASES
         qpoases_m = qpoases.PyQProblem(p.n, p.m)
@@ -42,24 +57,20 @@ class qpOASES(Solver):
 
         qpoases_m.setOptions(options)
 
-        # The maximum cpu time has to be initialized as an array
-        # and then is returned by changing this value
-        qpoases_cpu_time = np.array([10.])
-
-        if qpoases_cpu_time is None:
+        if 'cputime' not in self.options:
+            # Set default to max 10 seconds in runtime
             qpoases_cpu_time = np.array([10.])
 
-        if nWSR is None:
-            nWSR = np.array([1000])
+        if 'nWSR' not in self.options:
+            # Set default to max 1000 working set recalculations
+            qpoases_nWSR = np.array([1000])
 
         # Set number of working set recalculations
-        status = qpoases_m.init(P.todense(), q, A.todense(), None, None, l, u,
+        status = qpoases_m.init(P, q, A, None, None, l, u,
                                 qpoases_nWSR, qpoases_cpu_time)
-        x = np.zeros(p.n)
-        y = np.zeros(p.m)
-        obj_val = qpoases_m.getObjVal()
-        qpoases_m.getPrimalSolution(x)
-        qpoases_m.getDualSolution(x)
+
+        # Check status
+        status = self.STATUS_MAP.get(status, qp.SOLVER_ERROR)
 
         # run_time
         run_time = qpoases_cpu_time[0]
@@ -67,15 +78,19 @@ class qpOASES(Solver):
         # number of iterations
         niter = qpoases_nWSR[0]
 
-        # Print results
-        print('Norm of x value difference = %.4f' %
-              np.linalg.norm(res_osqp_x - res_qpoases_x))
-        print('Norm of objective value difference = %.4f' %
-              abs(res_osqp_objval - res_qpoases_objval))
-        print('Time qpoases %.4f' % qpoases_cpu_time[0])
+        if status in qp.SOLUTION_PRESENT:
+            x = np.zeros(p.n)
+            y_temp = np.zeros(p.n + p.m)
+            obj_val = qpoases_m.getObjVal()
+            qpoases_m.getPrimalSolution(x)
+            qpoases_m.getDualSolution(y_temp)
+            
+            # Change sign and take only last part of y (No bounds on x in our formulation)
+            y = -y_temp[p.n:]
 
-
-
-        return QuadprogResults(status, obj_val,
-                               x, y,
-                               run_time, niter)
+            return QuadprogResults(status, obj_val,
+                                   x, y,
+                                   run_time, niter)
+        else:
+            return QuadprogResults(status, None, None, None,
+                                   run_time, niter)

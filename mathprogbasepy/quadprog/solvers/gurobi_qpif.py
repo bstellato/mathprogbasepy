@@ -18,7 +18,7 @@ class GUROBI(Solver):
     STATUS_MAP = {2: qp.OPTIMAL,
                   3: qp.PRIMAL_INFEASIBLE,
                   5: qp.DUAL_INFEASIBLE,
-                  4: qp.SOLVER_ERROR,
+                  4: qp.PRIMAL_OR_DUAL_INFEASIBLE,
                   6: qp.SOLVER_ERROR,
                   7: qp.MAX_ITER_REACHED,
                   8: qp.SOLVER_ERROR,
@@ -128,10 +128,11 @@ class GUROBI(Solver):
 
         # Return results
         # --------------
+
         # Get status
         status = self.STATUS_MAP.get(model.Status, qp.SOLVER_ERROR)
 
-        if (status != qp.SOLVER_ERROR) & (status != qp.PRIMAL_INFEASIBLE):
+        if status in qp.SOLUTION_PRESENT:
             # Get objective value
             objval = model.objVal
 
