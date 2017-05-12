@@ -29,7 +29,7 @@ results = p.solve(solver = OSQP)
 
 The current version is `0.1.1`
 
-The supported solvers at the moment are: `OSQP`, `GUROBI`, `CPLEX`, `MOSEK`.
+The supported solvers at the moment are: `OSQP`, `GUROBI`, `CPLEX`, `MOSEK`, `qpOASES`.
 
 
 Matrices `P` and `A` are in scipy sparse format. vectors `q`, `l` and `u` are numpy arrays.
