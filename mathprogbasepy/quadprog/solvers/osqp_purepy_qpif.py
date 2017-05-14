@@ -2,6 +2,7 @@
 import osqppurepy as osqp
 from mathprogbasepy.quadprog.results import QuadprogResults
 from mathprogbasepy.quadprog.solvers.solver import Solver
+import mathprogbasepy.quadprog.problem as qp
 
 
 class OSQP_PUREPY(Solver):
