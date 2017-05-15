@@ -31,11 +31,15 @@ class qpOASES(Solver):
         if p.i_idx is not None:
             raise ValueError('Cannot solve MIQPs with qpOASES')
 
+
         # Define contiguous array vectors
         q = np.ascontiguousarray(p.q)
         l = np.ascontiguousarray(p.l)
         u = np.ascontiguousarray(p.u)
 
+        # Create infinite arrays of bounds
+        lx = np.ascontiguousarray(-np.inf * np.ones(p.n))
+        ux = np.ascontiguousarray(np.inf * np.ones(p.n))
 
         # Solve with qpOASES
         qpoases_m = qpoases.PyQProblem(p.n, p.m)
@@ -66,7 +70,7 @@ class qpOASES(Solver):
             qpoases_nWSR = np.array([1000])
 
         # Set number of working set recalculations
-        status = qpoases_m.init(P, q, A, None, None, l, u,
+        status = qpoases_m.init(P, q, A, lx, ux, l, u,
                                 qpoases_nWSR, qpoases_cpu_time)
 
         # Check status

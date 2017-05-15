@@ -122,7 +122,8 @@ class GUROBI(Solver):
             # Solve
             model.optimize()
         except:  # Error in the solution
-            print("Error in Gurobi solution\n")
+            if self.options['verbose']:
+                print("Error in GUROBI solution\n")
             return QuadprogResults(qp.SOLVER_ERROR, None, None, None,
                                    np.inf, None)
 
