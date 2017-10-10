@@ -98,8 +98,7 @@ class MOSEK(Solver):
                     bound_key = mosek.boundkey.up
 
                 # Add bound
-                task.putconbound(j,
-                                 bound_key, l_temp, u_temp)
+                task.putconbound(j,  bound_key, l_temp, u_temp)
 
         # Add quadratic cost
         if p.P.count_nonzero():  # If there are any nonzero elms in P
