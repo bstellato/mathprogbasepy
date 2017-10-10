@@ -124,8 +124,15 @@ class MOSEK(Solver):
         '''
         Solve problem
         '''
-        # Optimization and check termination code
-        trmcode = task.optimize()
+        try:
+            # Optimization and check termination code
+            trmcode = task.optimize()
+        except:
+            if self.options['verbose']:
+                print("Error in MOSEK solution\n")
+            return QuadprogResults(qp.SOLVER_ERROR, None, None, None,
+                                   np.inf, None)
+
 
         if self.options['verbose']:
             task.solutionsummary(mosek.streamtype.msg)

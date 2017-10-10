@@ -119,7 +119,8 @@ class CPLEX(Solver):
             model.solve()
             end = model.get_time()
         except:  # Error in the solution
-            print("Error in CPLEX solution\n")
+            if self.options['verbose']:
+                print("Error in CPLEX solution\n")
             return QuadprogResults(qp.SOLVER_ERROR, None, None, None,
                                    np.inf, None)
 
