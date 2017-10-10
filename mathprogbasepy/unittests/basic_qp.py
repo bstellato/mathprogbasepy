@@ -39,7 +39,7 @@ class basic_qp(unittest.TestCase):
         res_mosek = self.p.solve(solver=mpbpy.MOSEK)
 
         # Solve with OSQP
-        res_osqp = self.p.solve(solver=mpbpy.OSQP)
+        res_osqp = self.p.solve(solver=mpbpy.OSQP, polish=True)
 
         # Solve with qpOASES
         res_qpoases = self.p.solve(solver=mpbpy.qpOASES)
@@ -70,13 +70,13 @@ class basic_qp(unittest.TestCase):
         # Assert solutions matching (GUROBI - OSQP)
         nptest.assert_allclose(res_gurobi.obj_val,
                                res_osqp.obj_val,
-                               rtol=1e-4, atol=1e-4)
+                               rtol=1e-3, atol=1e-3)
         nptest.assert_allclose(res_gurobi.x,
                                res_osqp.x,
-                               rtol=1e-4, atol=1e-4)
+                               rtol=1e-3, atol=1e-3)
         nptest.assert_allclose(res_gurobi.y,
                                res_osqp.y,
-                               rtol=1e-4, atol=1e-4)
+                               rtol=1e-3, atol=1e-3)
 
         # Assert solutions matching (GUROBI - qpOASES)
         nptest.assert_allclose(res_gurobi.obj_val,

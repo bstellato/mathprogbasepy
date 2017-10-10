@@ -26,7 +26,7 @@ class QuadprogProblem(object):
     Defines QP problem of the form
         minimize	1/2 x' P x + q' x
         subject to	l <= A x <= u
-                    x_i \in Z for i \in i_idx
+                    x_i \\in Z for i \\in i_idx
 
     Attributes
     ----------
