@@ -12,7 +12,8 @@ It is possible to define quadratic programs of the form
 ```
 minimize     (1/2) x' P x + q' x
 subject to   l <= A x <= u
-             x_i \in Z for i in I_idx
+             x[i] \in Z for i in I_idx
+             i_l[i] <= x[i] <= i_u[i] for i in I_idx
 ```
 
 with
@@ -23,7 +24,7 @@ from mathprogbasepy import *
 # Define problem data
 # ...
 
-p = QuadprogProblem(P, q, A, l, u, i_idx)
+p = QuadprogProblem(P, q, A, l, u, i_idx, i_l, i_u)
 results = p.solve(solver = OSQP)
 ```
 
