@@ -30,7 +30,11 @@ class basic_miqp(unittest.TestCase):
         # Generate random vector of indeces
         i_idx = np.random.choice(np.arange(0, n), p, replace=False)
 
-        self.p = mpbpy.QuadprogProblem(P, q, A, l, u, i_idx)
+        # Generate variable bounds 
+        i_l = -1*np.ones(p)
+        i_u = 1*np.ones(p)
+
+        self.p = mpbpy.QuadprogProblem(P, q, A, l, u, i_idx, i_l, i_u)
 
     def test_basic_MIQP(self):
         # Solve with GUROBI
@@ -49,7 +53,6 @@ class basic_miqp(unittest.TestCase):
         nptest.assert_allclose(res_gurobi.x,
                                res_cplex.x,
                                rtol=1e-4, atol=1e-4)
-
 
         # Assert solutions matching (GUROBI - MOSEK)
         nptest.assert_allclose(res_gurobi.obj_val,

@@ -62,9 +62,15 @@ class CPLEX(Solver):
         # Constrain integer variables if present
         # import ipdb; ipdb.set_trace()
         if p.i_idx is not None:
-            for idx in p.i_idx:
+            for i in range(len(p.i_idx)):
                 # import ipdb; ipdb.set_trace()
-                model.variables.set_types(var_idx[idx], 'I')
+                model.variables.set_types(var_idx[p.i_idx[i]], 'I')
+                if p.i_l is not None:
+                    model.variables.set_lower_bounds(var_idx[p.i_idx[i]],
+                                                     p.i_l[i])
+                if p.i_u is not None:
+                    model.variables.set_upper_bounds(var_idx[p.i_idx[i]], 
+                                                      p.i_u[i])
 
         # Add constraints
         for i in range(m):  # Add inequalities

@@ -63,8 +63,12 @@ class GUROBI(Solver):
 
         # Constrain integer variables if present
         if p.i_idx is not None:
-            for i in p.i_idx:
-                x[i].setAttr("vtype", 'I')
+            for i in range(len(p.i_idx)):
+                x[p.i_idx[i]].setAttr("vtype", 'I')
+                if p.i_l is not None:
+                    x[p.i_idx[i]].setAttr("lb", p.i_l[i])
+                if p.i_u is not None:
+                    x[p.i_idx[i]].setAttr("ub", p.i_u[i])
 
         model.update()
 

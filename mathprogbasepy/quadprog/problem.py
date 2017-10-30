@@ -26,6 +26,7 @@ class QuadprogProblem(object):
     Defines QP problem of the form
         minimize	1/2 x' P x + q' x
         subject to	l <= A x <= u
+                    i_l[i] <= x_i <= i_u[i] for i \\in i_idx
                     x_i \\in Z for i \\in i_idx
 
     Attributes
@@ -40,11 +41,18 @@ class QuadprogProblem(object):
         constraints lower bound
     u: numpy vector
         constraints upper bound
+    i_l: numpy vector
+        lower bound on integer variables
+    i_u: numpy vector
+        upper bound on integer variables
     i_idx: numpy vector
         index of integer variables
     """
 
-    def __init__(self, P=None, q=None, A=None, l=None, u=None, i_idx=None, x0=None):
+    def __init__(self, P=None, q=None, A=None, 
+                 l=None, u=None, i_idx=None, 
+                 i_l=None, i_u=None,
+                 x0=None):
 
 
         #
@@ -64,12 +72,21 @@ class QuadprogProblem(object):
         else:
             self.m = A.shape[0]
 
+        if i_idx is not None:
+            if i_l is not None:
+                if len(i_l) != len(i_idx):
+                    raise ValueError("Wrong number of integer variables lower bounds")
+            if i_u is not None:
+                if len(i_u) != len(i_idx):
+                    raise ValueError("Wrong number of integer variables upper bounds")
         self.P = P
         self.q = q
         self.A = A
         self.l = l if l is not None else -np.inf*np.ones(P.shape[0])
         self.u = u if u is not None else np.inf*np.ones(P.shape[0])
         self.i_idx = i_idx
+        self.i_u = i_u
+        self.i_l = i_l
         self.x0 = x0
 
         if x0 is not None and len(x0) != self.n:

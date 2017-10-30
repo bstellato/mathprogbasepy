@@ -1,7 +1,7 @@
 """
 miOSQP interface to solve MIQP problems
 """
-import osqp
+import miosqp
 from mathprogbasepy.quadprog.results import QuadprogResults
 from mathprogbasepy.quadprog.solvers.solver import Solver
 
@@ -13,6 +13,9 @@ class MIOSQP(Solver):
 
     def solve(self, p):
 
-        res = miosqp_solve(p.P, p.Q, p.A, p.l, p.u, p.i_idx)
+        model = miosqp.MIOSQP()
+        model.setup(p.P, p.q, p.A, p.l, p.u, p.i_idx, p.i_l, p.i_u, 
+                    self.options)
+        res_miosqp = model.solve()
 
-        return res
+        return res_miosqp

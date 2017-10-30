@@ -68,13 +68,23 @@ class MOSEK(Solver):
             task.putcj(j, p.q[j])
             task.putvarbound(j, mosek.boundkey.fr, -np.inf, np.inf)
 
-
         # Constrain integer variables if present
         if p.i_idx is not None:
             int_types = [mosek.variabletype.type_int] * len(p.i_idx)
             int_idx = p.i_idx.tolist()
             task.putvartypelist(int_idx, int_types)
 
+            for i in range(len(p.i_idx)):
+                if p.i_l is None and p.i_u is not None:
+                    task.putvarbound(p.i_idx[i], 
+                                     mosek.boundkey.up, 0, p.i_u[i])
+                elif p.i_l is not None and p.i_u is None:
+                    task.putvarbound(p.i_idx[i], 
+                                     mosek.boundkey.lo, p.i_l[i], 0)
+                elif p.i_l is not None and p.i_u is not None:
+                    task.putvarbound(p.i_idx[i], 
+                                     mosek.boundkey.ra, p.i_l[i], p.i_u[i])
+                   
         # Add constraints
         if p.A is not None:
             row_A, col_A, el_A = spa.find(p.A)
