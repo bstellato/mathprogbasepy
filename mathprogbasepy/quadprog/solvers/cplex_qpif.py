@@ -47,6 +47,14 @@ class CPLEX(Solver):
         # Convert infinity values to Cplex Infinity
         u = np.minimum(u, cpx.infinity)
         l = np.maximum(l, -cpx.infinity)
+        if p.i_l is not None:
+            i_l = np.maximum(p.i_l, -cpx.infinity)
+        else:
+            i_l = None
+        if p.i_u is not None:
+            i_u = np.minimum(p.i_u, cpx.infinity)
+        else:
+            i_u = None
 
         # Define CPLEX problem
         model = cpx.Cplex()
@@ -57,7 +65,7 @@ class CPLEX(Solver):
         # Add variables
         var_idx = model.variables.add(obj=p.q,
                                       lb=-cpx.infinity*np.ones(n),
-                                      ub=cpx.infinity*np.ones(n))  # Linear obj part
+                                      ub=cpx.infinity*np.ones(n))
 
         # Constrain integer variables if present
         # import ipdb; ipdb.set_trace()
@@ -65,12 +73,12 @@ class CPLEX(Solver):
             for i in range(len(p.i_idx)):
                 # import ipdb; ipdb.set_trace()
                 model.variables.set_types(var_idx[p.i_idx[i]], 'I')
-                if p.i_l is not None:
+                if i_l is not None:
                     model.variables.set_lower_bounds(var_idx[p.i_idx[i]],
-                                                     p.i_l[i])
-                if p.i_u is not None:
+                                                     i_l[i])
+                if i_u is not None:
                     model.variables.set_upper_bounds(var_idx[p.i_idx[i]], 
-                                                      p.i_u[i])
+                                                     i_u[i])
 
         # Add constraints
         for i in range(m):  # Add inequalities

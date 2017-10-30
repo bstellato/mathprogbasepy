@@ -34,7 +34,6 @@ class MOSEK(Solver):
         n = p.P.shape[0]
         m = p.A.shape[0]
 
-
         '''
         Load problem
         '''

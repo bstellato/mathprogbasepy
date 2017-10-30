@@ -45,6 +45,15 @@ class GUROBI(Solver):
         # Adjust infinity values in bounds
         u = np.copy(p.u)
         l = np.copy(p.l)
+        
+        if p.i_l is not None:
+            i_l = np.copy(p.i_l)
+        else:
+            i_l = None
+        if p.i_u is not None:
+            i_u = np.copy(p.i_u)
+        else:
+            i_u = None
 
         for i in range(m):
             if u[i] >= 1e20:
@@ -52,6 +61,15 @@ class GUROBI(Solver):
             if l[i] <= -1e20:
                 l[i] = -grb.GRB.INFINITY
 
+        if i_u is not None:
+            for i in range(len(i_u)):
+                if i_u[i] >= 1e20:
+                    i_u[i] = grb.GRB.INFTY
+        if i_l is not None:
+            for i in range(len(i_l)):
+                if i_l[i] <= -1e20:
+                    i_l[i] = -grb.GRB.INFTY
+       
         # Create a new model
         model = grb.Model("qp")
 
@@ -65,10 +83,10 @@ class GUROBI(Solver):
         if p.i_idx is not None:
             for i in range(len(p.i_idx)):
                 x[p.i_idx[i]].setAttr("vtype", 'I')
-                if p.i_l is not None:
-                    x[p.i_idx[i]].setAttr("lb", p.i_l[i])
-                if p.i_u is not None:
-                    x[p.i_idx[i]].setAttr("ub", p.i_u[i])
+                if i_l is not None:
+                    x[p.i_idx[i]].setAttr("lb", i_l[i])
+                if i_u is not None:
+                    x[p.i_idx[i]].setAttr("ub", i_u[i])
 
         model.update()
 
